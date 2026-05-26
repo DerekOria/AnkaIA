@@ -1,5 +1,5 @@
 import express from 'express';
-import { analyzeErrorLog } from './src/services/ollamaService.js';
+import { analyzeErrorLog } from './services/ollamaService.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
