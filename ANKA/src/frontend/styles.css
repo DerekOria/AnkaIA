@@ -1,0 +1,135 @@
+:root {
+  --bg: #05060a;
+  --card: #071028;
+  --accent: #00f5ff;
+  --accent-2: #7c4dff;
+  --muted: #8a93a8;
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background:
+    radial-gradient(
+      ellipse at 10% 10%,
+      rgba(124, 77, 255, 0.06),
+      transparent 20%
+    ),
+    linear-gradient(180deg, #05060a, #071025);
+  font-family:
+    Inter,
+    Segoe UI,
+    Arial;
+  color: #e6f7ff;
+}
+.app {
+  max-width: 980px;
+  margin: 28px auto;
+  padding: 22px;
+  border-radius: 12px;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.02),
+    rgba(255, 255, 255, 0.01)
+  );
+  box-shadow: 0 6px 30px rgba(7, 16, 40, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.top h1 {
+  margin: 0;
+  font-size: 28px;
+  letter-spacing: 2px;
+  color: var(--accent);
+}
+.subtitle {
+  margin: 0;
+  color: var(--muted);
+}
+.panel {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 14px;
+  margin-top: 18px;
+}
+.chat {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.01),
+    rgba(255, 255, 255, 0)
+  );
+  padding: 16px;
+  border-radius: 10px;
+  min-height: 360px;
+  max-height: 60vh;
+  overflow: auto;
+  border: 1px solid rgba(255, 255, 255, 0.02);
+}
+.message {
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 10px;
+}
+.message.user {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 245, 255, 0.06),
+    rgba(124, 77, 255, 0.04)
+  );
+  text-align: right;
+}
+.message.ai {
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 3px solid var(--accent);
+}
+.controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+#input {
+  flex: 1;
+  min-height: 56px;
+  padding: 12px;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  resize: vertical;
+}
+.buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+.mic,
+.send {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  background: linear-gradient(180deg, var(--accent), var(--accent-2));
+  color: #021;
+  box-shadow: 0 6px 18px rgba(124, 77, 255, 0.12);
+}
+.mic {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  color: var(--accent);
+}
+.footer {
+  margin-top: 12px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+/* small tweaks */
+.message pre {
+  white-space: pre-wrap;
+  margin: 0;
+}

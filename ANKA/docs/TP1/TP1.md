@@ -12,7 +12,7 @@
 | Idée | Description | Faisabilité (7 jours) | Intérêt personnel |
 | :--- | :--- | :--- | :--- |
 | **1. Architecture de données (OpenSpec)** | Utilisation d'OpenSpec pour générer un schéma de DB et une API à partir de langage naturel. | Élevée (12h de specs, 16h validation). | Explorer le "vibe coding" et la productivité sans écrire de code source. |
-| **2. Assistant Support IA (ANKA)** | Assistant vocal local qui capture l'écran automatiquement à la demande, identifie les erreurs via un modèle de vision fine-tuné (YOLOv8), et explique vocalement la solution — sans internet. | **Élevée** avec GPU NVIDIA. Le MVP est modulaire : chaque composante est livrable indépendamment. | **Sujet retenu** : Combine fine-tuning réel, NLP, audio et interface HUD dans un pipeline complet et démonstratif. |
+| **2. Assistant Support IA (Node.js/Ollama)** | Infrastructure locale avec Ollama et API Express pour un assistant technique 100% offline. | **Élevée** (Installation, config API et Benchmarking). | **Sujet retenu** : Allie l'infrastructure IA, la confidentialité et le backend Node.js. |
 | **3. Traducteur de Logique (GSD)** | Conversion de pseudocode en code Rust/Go via la méthodologie GSD. | Moyenne (Complexité de la syntaxe Rust pour un projet rapide). | Tester si la logique pure peut surpasser la barrière de la syntaxe. |
 
 ---
@@ -30,10 +30,10 @@
 ## 3. Proposition formelle
 
 ### Titre du projet
-**Anka : Assistant IA local de support technique.**
+**SentiLog-Local : Assistant de diagnostic technique auto-hébergé via Node.js et Ollama.**
 
 ### Introduction
-Ce projet s’inscrit dans le thème « L’IA au service du développeur ». L'objectif est de démontrer comment automatiser le diagnostic technique de manière privée et performante. Anka combine la vision par ordinateur (YOLOv8) pour identifier l'erreur visuelle et un LLM local (Ollama) pour générer la solution, le tout orchestré par Node.js.
+Ce projet s’inscrit dans le thème **« L’IA au service du développeur »**. L'objectif est de démontrer comment un développeur peut automatiser l'analyse de logs système de manière privée et performante. En utilisant un serveur d'inférence local piloté par une API Node.js, on élimine les coûts d'API cloud et les risques liés à la sécurité des données.
 
 ### Prérecherche
 Parmi les options explorées, l'assistant local Node.js est le plus pertinent. Contrairement au volet de développement pur, celui-ci me force à comprendre l'infrastructure de l'IA (modèles Llama 3 vs Mistral) et son intégration via des outils modernes de backend JavaScript.
@@ -46,10 +46,9 @@ Parmi les options explorées, l'assistant local Node.js est le plus pertinent. C
 
 ### MVP (Minimum Viable Product)
 Le projet sera considéré comme **terminé** si :
-1. L'application Node.js capture l'écran et identifie une erreur via YOLOv8.
-2. Une route Express transmet l'erreur identifiée à Ollama.
-3. Ollama retourne une solution structurée (Cause, Solution) en moins de 10 secondes.
-4. Une étude comparative compare la précision de Llama 3 et Mistral pour ce diagnostic.
+1. L'application Node.js communique avec succès avec l'API d'Ollama.
+2. Une route Express reçoit un log d'erreur et retourne un diagnostic structuré (Erreur, Cause, Solution).
+3. Une étude comparative des performances est produite, incluant la latence (secondes), la pertinence qualitative et la consommation mémoire (RAM).
 
 ### Méthodologie (Approche SDD avec GSD)
 Le projet suit une approche rigoureuse de développement piloté par les spécifications. La méthodologie GSD est appliquée comme suit : avant chaque phase, un document de specs est rédigé. Le code n'est écrit qu'une fois ces specs validées.
@@ -57,7 +56,7 @@ Le projet suit une approche rigoureuse de développement piloté par les spécif
 * **Phase 1 - Infrastructure (Jours 1-2) :** Setup des drivers CUDA, installation d'Ollama et tests initiaux.
 * **Phase 2 - Spécifications GSD (Jour 3) :** Rédaction formelle du document de specs : *system prompts*, règles de parsing et critères d'acceptation de l'API.
 * **Phase 3 - Développement Backend (Jours 4-6) :** Création du serveur Express et intégration d' `ollama-js`, en suivant strictement les specs de la Phase 2.
-* **Phase 4 - Tests, Benchmark et Validation (Jour 7) :** Analyse de logs réels, mesure comparative (Llama 3 vs Mistral) et rédaction du rapport final.
+* **Phase 4 - Tests, Benchmark et Validation (Jour 7) :** Analyse et résolution des problèmes réels, mesure comparative (Llama 3 vs Mistral) et rédaction du rapport final.
 
 ### Outils et technologies
 * **Inférence :** Ollama

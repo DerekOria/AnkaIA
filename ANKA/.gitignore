@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Vite & Build
+dist/
+.vite/
+*.log
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# File uploads
+uploads/
+tmp_uploads/
+
+# Data files
+*.log
+error.log
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Temp
+tmp/
+tmp_uploads/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/

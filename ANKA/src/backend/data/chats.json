@@ -1,0 +1,10 @@
+{
+  "chats": [
+    {
+      "id": "default",
+      "name": "General Chat",
+      "createdAt": "2026-06-01T00:00:00Z",
+      "messages": []
+    }
+  ]
+}
