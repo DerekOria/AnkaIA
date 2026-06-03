@@ -1,0 +1,12 @@
+{
+  "watch": ["src/backend", "src/services"],
+  "ext": "js,mjs,cjs",
+  "ignore": [
+    "src/backend/storage/chats.json",
+    "error.log",
+    "uploads/**",
+    "tmp_uploads/**",
+    "node_modules/**",
+    "dist/**"
+  ]
+}

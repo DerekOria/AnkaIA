@@ -42,3 +42,8 @@ __pycache__/
 *.pyo
 .venv/
 venv/
+
+.env
+**/.env
+src/voice-backend/.env
+ANKA/src/voice-backend/.env

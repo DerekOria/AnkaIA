@@ -1,0 +1,276 @@
+{
+  "chats": [
+    {
+      "id": "default",
+      "name": "General Chat",
+      "createdAt": "2026-06-01T00:00:00Z",
+      "messages": [
+        {
+          "id": "msg-1780380145561",
+          "role": "user",
+          "content": "hola",
+          "timestamp": "2026-06-02T06:02:25.561Z"
+        },
+        {
+          "id": "msg-1780380157052",
+          "role": "user",
+          "content": "fasdfasdf",
+          "timestamp": "2026-06-02T06:02:37.052Z"
+        },
+        {
+          "id": "msg-1780380291682",
+          "role": "user",
+          "content": "dasdas",
+          "timestamp": "2026-06-02T06:04:51.682Z"
+        },
+        {
+          "id": "msg-1780380403108",
+          "role": "user",
+          "content": "Hola",
+          "timestamp": "2026-06-02T06:06:43.108Z"
+        },
+        {
+          "id": "msg-1780380404650",
+          "role": "ai",
+          "content": "Hola! No hay errores técnicos que reportar, así que podemos empezar a charlar. ¿En qué puedo ayudarte hoy?",
+          "timestamp": "2026-06-02T06:06:44.649Z"
+        },
+        {
+          "id": "msg-1780380421248",
+          "role": "user",
+          "content": "Cual es tu idioma principal",
+          "timestamp": "2026-06-02T06:07:01.248Z"
+        },
+        {
+          "id": "msg-1780380422966",
+          "role": "ai",
+          "content": "Mi idioma principal es el español. Puedo responder a tus preguntas y conversar contigo en este idioma. ¿En qué puedo ayudarte hoy?",
+          "timestamp": "2026-06-02T06:07:02.965Z"
+        },
+        {
+          "id": "msg-1780449856857",
+          "role": "user",
+          "content": "Start talking in english",
+          "timestamp": "2026-06-03T01:24:16.857Z"
+        },
+        {
+          "id": "msg-1780449856858",
+          "role": "ai",
+          "content": "I'd be happy to switch to English! Hi there, how can I help you today? Do you have any questions or concerns about technology, or just want to chat? I'm here to listen and assist if needed.",
+          "timestamp": "2026-06-03T01:24:16.857Z",
+          "streaming": false,
+          "completedAt": "2026-06-03T01:24:18.957Z"
+        },
+        {
+          "id": "msg-1780450663904",
+          "role": "user",
+          "content": "Me escuchaste?",
+          "timestamp": "2026-06-03T01:37:43.905Z"
+        },
+        {
+          "id": "msg-1780450663906",
+          "role": "ai",
+          "content": "You're speaking Spanish again! Don't worry, I still understand what you said. You asked me if I listened to you, which is correct - I did hear your message in English earlier. If you want to continue our conversation in English, feel free to keep going!",
+          "timestamp": "2026-06-03T01:37:43.905Z",
+          "streaming": false,
+          "completedAt": "2026-06-03T01:37:56.294Z"
+        },
+        {
+          "id": "msg-1780493998325",
+          "role": "user",
+          "content": "I want 3 advices to be a better figther",
+          "timestamp": "2026-06-03T13:39:58.325Z"
+        },
+        {
+          "id": "msg-1780493998326",
+          "role": "ai",
+          "content": "Here are three advice to help you become a better fighter:\n\n1. **Master Your Footwork**: Good footwork is essential for any martial artist. It allows you to create distance, evade attacks, and set up your own strikes. Practice shuffling, bobbing, and weaving to improve your overall movement.\n\n2. **Condition Yourself Physically and Mentally**: Fighting requires a combination of physical strength, endurance, and mental toughness. Incorporate conditioning exercises like cardio, strength training, and flexibility work into your routine. Additionally, practice visualization techniques to mentally prepare yourself for competition.\n\n3. **Focus on Defense as Much as Offense**: A good fighter knows how to defend themselves just as well as they know how to attack. Practice blocking, parrying, and evading attacks to improve your defensive skills. Remember, a strong defense can often lead to more opportunities to counterattack and gain the upper hand.\n\nRemember, becoming a better fighter takes time, patience, and dedication. Keep working on these areas and you'll see improvement over time!",
+          "timestamp": "2026-06-03T13:39:58.325Z",
+          "streaming": false,
+          "completedAt": "2026-06-03T13:40:12.637Z"
+        }
+      ]
+    },
+    {
+      "id": "chat-1780379906466",
+      "name": "New Chat 1:58:26 AM",
+      "createdAt": "2026-06-02T05:58:26.466Z",
+      "messages": [
+        {
+          "id": "msg-1780379911551",
+          "role": "user",
+          "content": "Hola",
+          "timestamp": "2026-06-02T05:58:31.551Z"
+        },
+        {
+          "id": "msg-1780379943865",
+          "role": "user",
+          "content": "Que pasa",
+          "timestamp": "2026-06-02T05:59:03.865Z"
+        },
+        {
+          "id": "msg-1780379947684",
+          "role": "user",
+          "content": "asdfasd",
+          "timestamp": "2026-06-02T05:59:07.684Z"
+        },
+        {
+          "id": "msg-1780380237410",
+          "role": "user",
+          "content": "asfsad",
+          "timestamp": "2026-06-02T06:03:57.410Z"
+        }
+      ]
+    },
+    {
+      "id": "chat-1780380241720",
+      "name": "New Chat 2:04:01 AM",
+      "createdAt": "2026-06-02T06:04:01.720Z",
+      "messages": [
+        {
+          "id": "msg-1780380243672",
+          "role": "user",
+          "content": "Hola",
+          "timestamp": "2026-06-02T06:04:03.672Z"
+        }
+      ]
+    },
+    {
+      "id": "chat-1780448340380",
+      "name": "New Chat 8:59:00 PM",
+      "createdAt": "2026-06-03T00:59:00.380Z",
+      "messages": [
+        {
+          "id": "msg-1780448352835",
+          "role": "user",
+          "content": "Hi, please give me a base code of Arduino",
+          "timestamp": "2026-06-03T00:59:12.835Z"
+        },
+        {
+          "id": "msg-1780448367133",
+          "role": "ai",
+          "content": "Bonjour !\n\nHere is a basic Arduino code to get you started:\n```c++\nvoid setup() {\n  // Initialize digital pin 13 as an output\n  pinMode(13, OUTPUT);\n}\n\nvoid loop() {\n  // Turn the LED on\n  digitalWrite(13, HIGH);\n  delay(1000); // Wait for 1 second\n\n  // Turn the LED off\n  digitalWrite(13, LOW);\n  delay(1000); // Wait for 1 second\n}\n```\nThis code sets up digital pin 13 as an output and then blinks the built-in LED on and off at a rate of one second.\n\nNote: This is just a simple example to get you started. You can modify it or add more code to create your own projects!\n\nWhat would you like to do next?",
+          "timestamp": "2026-06-03T00:59:27.132Z"
+        }
+      ]
+    },
+    {
+      "id": "chat-1780448716596",
+      "name": "New Chat 9:05:16 PM",
+      "createdAt": "2026-06-03T01:05:16.596Z",
+      "messages": [
+        {
+          "id": "msg-1780448723257",
+          "role": "user",
+          "content": "My name is Derek",
+          "timestamp": "2026-06-03T01:05:23.257Z"
+        },
+        {
+          "id": "msg-1780448732755",
+          "role": "ai",
+          "content": "Nice to meet you, Derek! I'm Anka, your friendly AI assistant. How can I help you today? Do you have a technical issue or just need some general assistance? Let me know and I'll do my best to support you!",
+          "timestamp": "2026-06-03T01:05:32.754Z"
+        },
+        {
+          "id": "msg-1780448739936",
+          "role": "user",
+          "content": "What is my name?",
+          "timestamp": "2026-06-03T01:05:39.936Z"
+        },
+        {
+          "id": "msg-1780448740998",
+          "role": "ai",
+          "content": "Your name is Derek!",
+          "timestamp": "2026-06-03T01:05:40.997Z"
+        }
+      ]
+    },
+    {
+      "id": "chat-1780496121935",
+      "name": "New Chat 10:15:21 AM",
+      "createdAt": "2026-06-03T14:15:21.935Z",
+      "messages": []
+    },
+    {
+      "id": "chat-1780498298921",
+      "name": "New Chat 10:51:38 AM",
+      "createdAt": "2026-06-03T14:51:38.921Z",
+      "messages": [
+        {
+          "id": "msg-1780498305718",
+          "role": "user",
+          "content": "Hola, como estas?",
+          "timestamp": "2026-06-03T14:51:45.718Z"
+        },
+        {
+          "id": "msg-1780498305719",
+          "role": "ai",
+          "content": "Hola! Me alegra verte. Estoy aquí para ayudarte con cualquier problema o pregunta que tengas. ¿En qué puedo ayudarte hoy?",
+          "timestamp": "2026-06-03T14:51:45.718Z",
+          "streaming": false,
+          "completedAt": "2026-06-03T14:51:54.362Z"
+        }
+      ]
+    },
+    {
+      "id": "chat-1780498863833",
+      "name": "New Chat 11:01:03 AM",
+      "createdAt": "2026-06-03T15:01:03.833Z",
+      "messages": []
+    },
+    {
+      "id": "chat-1780498995161",
+      "name": "New Chat 11:03:13 AM",
+      "createdAt": "2026-06-03T15:03:15.161Z",
+      "messages": []
+    },
+    {
+      "id": "chat-1780499000546",
+      "name": "New Chat 11:03:18 AM",
+      "createdAt": "2026-06-03T15:03:20.546Z",
+      "messages": []
+    },
+    {
+      "id": "chat-1780499047133",
+      "name": "New Chat 11:04:07 AM",
+      "createdAt": "2026-06-03T15:04:07.133Z",
+      "messages": []
+    },
+    {
+      "id": "chat-1780499174545",
+      "name": "New Chat 11:06:14 AM",
+      "createdAt": "2026-06-03T15:06:14.545Z",
+      "messages": []
+    },
+    {
+      "id": "chat-1780499414090",
+      "name": "New Chat 11:10:14 AM",
+      "createdAt": "2026-06-03T15:10:14.090Z",
+      "messages": []
+    },
+    {
+      "id": "chat-1780500193011",
+      "name": "New Chat 11:23:12 AM",
+      "createdAt": "2026-06-03T15:23:13.011Z",
+      "messages": []
+    },
+    {
+      "id": "chat-1780500234684",
+      "name": "New Chat 11:23:54 AM",
+      "createdAt": "2026-06-03T15:23:54.684Z",
+      "messages": []
+    },
+    {
+      "id": "chat-1780500547493",
+      "name": "New Chat 11:29:07 AM",
+      "createdAt": "2026-06-03T15:29:07.493Z",
+      "messages": []
+    },
+    {
+      "id": "chat-1780500976006",
+      "name": "New Chat 11:36:15 AM",
+      "createdAt": "2026-06-03T15:36:16.006Z",
+      "messages": []
+    }
+  ]
+}

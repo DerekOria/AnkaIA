@@ -1,0 +1,7 @@
+fastapi
+uvicorn
+python-socketio
+python-dotenv
+google-genai
+pyaudio
+SpeechRecognition
