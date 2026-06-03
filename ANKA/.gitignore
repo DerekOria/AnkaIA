@@ -47,3 +47,5 @@ venv/
 **/.env
 src/voice-backend/.env
 ANKA/src/voice-backend/.env
+src/voice-backend/models/
+ANKA/src/voice-backend/models/

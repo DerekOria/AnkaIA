@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 from wake_listener import WakeListener
 from voice_loop import VoiceLoop
+from command_router import CommandRouter
 
 load_dotenv()
 
@@ -27,6 +28,9 @@ wake_listener = None
 wake_task = None
 
 connected_sid = None
+restarting_wake = False
+
+command_router = CommandRouter()
 
 
 @app.get("/status")
@@ -38,16 +42,6 @@ async def status():
         "voice_running": voice_task is not None and not voice_task.done(),
         "wake_running": wake_task is not None and not wake_task.done(),
     }
-
-
-async def emit_to_client(event_name, payload, sid=None):
-    target_sid = sid or connected_sid
-
-    if not target_sid:
-        print(f"[SOCKET] No connected client for event: {event_name}")
-        return
-
-    await sio.emit(event_name, payload, room=target_sid)
 
 
 @sio.event
@@ -80,8 +74,105 @@ async def disconnect(sid):
         connected_sid = None
 
 
-async def start_voice_internal(sid):
-    global voice_loop, voice_task, wake_listener
+async def stop_wake_listener():
+    global wake_listener, wake_task
+
+    if wake_listener:
+        print("[WAKE] Stopping wake listener...")
+        wake_listener.stop()
+
+    if wake_task and not wake_task.done():
+        wake_task.cancel()
+
+        try:
+            await wake_task
+        except asyncio.CancelledError:
+            print("[WAKE] Wake task cancelled successfully")
+        except Exception as error:
+            print(f"[WAKE] Error while stopping wake task: {error}")
+
+    wake_listener = None
+    wake_task = None
+
+    print("[WAKE] Wake listener fully stopped")
+
+
+async def start_wake_listener(sid=None):
+    global wake_listener, wake_task, connected_sid, restarting_wake
+
+    target_sid = sid or connected_sid
+
+    if not target_sid:
+        print("[WAKE] Cannot start wake listener: no connected client")
+        return
+
+    if voice_task and not voice_task.done():
+        print("[WAKE] Voice is running, wake listener will not start")
+        return
+
+    if wake_task and not wake_task.done():
+        print("[WAKE] Wake listener already running")
+        return
+
+    if restarting_wake:
+        print("[WAKE] Wake listener restart already in progress")
+        return
+
+    restarting_wake = True
+
+    try:
+        await asyncio.sleep(0.8)
+
+        if voice_task and not voice_task.done():
+            print("[WAKE] Voice started during delay, wake listener cancelled")
+            return
+
+        async def on_wake():
+            print("[WAKE] on_wake triggered")
+
+            await sio.emit(
+                "wake_detected",
+                {
+                    "message": "Hola Anka detected",
+                },
+                room=target_sid,
+            )
+
+            await sio.emit(
+                "voice_status",
+                {
+                    "status": "wake_detected",
+                    "message": "Hola Anka detected. Starting ANKA voice mode...",
+                },
+                room=target_sid,
+            )
+
+            await start_voice_internal(target_sid, started_by_wake=True)
+
+        def on_wake_status(payload):
+            asyncio.create_task(
+                sio.emit(
+                    "voice_status",
+                    payload,
+                    room=target_sid,
+                )
+            )
+
+        wake_listener = WakeListener(
+            on_wake=on_wake,
+            on_status=on_wake_status,
+        )
+
+        wake_task = asyncio.create_task(wake_listener.run())
+
+        print("[WAKE] Wake listener started")
+
+    finally:
+        restarting_wake = False
+
+
+async def start_voice_internal(sid, started_by_wake=False):
+    global voice_loop, voice_task
 
     if voice_task and not voice_task.done():
         await sio.emit(
@@ -98,14 +189,68 @@ async def start_voice_internal(sid):
         voice_loop = None
         voice_task = None
 
-    if wake_listener:
-        wake_listener.pause()
+    # Critical: fully stop Vosk so Gemini can take the microphone.
+    await stop_wake_listener()
 
     def on_status(payload):
-        asyncio.create_task(sio.emit("voice_status", payload, room=sid))
+        asyncio.create_task(
+            sio.emit(
+                "voice_status",
+                payload,
+                room=sid,
+            )
+        )
 
     def on_transcription(payload):
-        asyncio.create_task(sio.emit("voice_transcription", payload, room=sid))
+        async def handle_transcription():
+            await sio.emit(
+                "voice_transcription",
+                payload,
+                room=sid,
+            )
+
+            role = payload.get("role")
+            text = payload.get("text", "")
+
+            if role != "user":
+                return
+
+            result = command_router.detect_and_execute(text)
+
+            if not result:
+                return
+
+            tool_payload = {
+                "command": result.get("command"),
+                "success": result.get("success", False),
+                "message": result.get("message", ""),
+            }
+
+            await sio.emit(
+                "tool_result",
+                tool_payload,
+                room=sid,
+            )
+
+            await sio.emit(
+                "voice_transcription",
+                {
+                    "role": "assistant",
+                    "text": result.get("message", ""),
+                },
+                room=sid,
+            )
+
+            await sio.emit(
+                "voice_status",
+                {
+                    "status": "tool_executed",
+                    "message": result.get("message", ""),
+                },
+                room=sid,
+            )
+
+        asyncio.create_task(handle_transcription())
 
     def on_error(message):
         asyncio.create_task(
@@ -127,7 +272,7 @@ async def start_voice_internal(sid):
     voice_task = asyncio.create_task(voice_loop.run())
 
     def on_voice_task_done(task):
-        global voice_loop, voice_task, wake_listener
+        global voice_loop, voice_task
 
         try:
             task.result()
@@ -139,10 +284,11 @@ async def start_voice_internal(sid):
         voice_loop = None
         voice_task = None
 
-        if wake_listener:
-            wake_listener.resume()
-
         print("[VOICE] Voice task cleaned up")
+
+        # Do not restart wake here.
+        # stop_voice() is responsible for restarting wake.
+        # This avoids duplicate wake restarts.
 
     voice_task.add_done_callback(on_voice_task_done)
 
@@ -156,50 +302,17 @@ async def start_voice_internal(sid):
     )
 
 
-async def start_wake_listener(sid):
-    global wake_listener, wake_task
-
-    if wake_task and not wake_task.done():
-        print("[WAKE] Wake listener already running")
-        return
-
-    async def on_wake():
-        print("[WAKE] on_wake triggered")
-
-        await sio.emit(
-            "wake_detected",
-            {
-                "message": "Hola Anka detected",
-            },
-            room=sid,
-        )
-
-        await start_voice_internal(sid)
-
-    def on_wake_status(payload):
-        asyncio.create_task(sio.emit("voice_status", payload, room=sid))
-
-    wake_listener = WakeListener(
-        on_wake=on_wake,
-        on_status=on_wake_status,
-    )
-
-    wake_task = asyncio.create_task(wake_listener.run())
-
-    print("[WAKE] Wake listener started")
-
-
 @sio.event
 async def start_voice(sid, data=None):
     print(f"[VOICE] start_voice received from {sid}")
     print(f"[VOICE] data: {data}")
 
-    await start_voice_internal(sid)
+    await start_voice_internal(sid, started_by_wake=False)
 
 
 @sio.event
 async def stop_voice(sid):
-    global voice_loop, voice_task, wake_listener
+    global voice_loop, voice_task
 
     print(f"[VOICE] stop_voice received from {sid}")
 
@@ -220,17 +333,16 @@ async def stop_voice(sid):
     voice_loop = None
     voice_task = None
 
-    if wake_listener:
-        wake_listener.resume()
-
     await sio.emit(
         "voice_status",
         {
             "status": "stopped",
-            "message": "Voice session stopped. Say 'Hola Anka' to activate again.",
+            "message": "Voice session stopped. Say 'Hola Anka' to wake me.",
         },
         room=sid,
     )
+
+    await start_wake_listener(sid)
 
 
 @sio.event
@@ -279,25 +391,9 @@ async def start_wake(sid):
 
 @sio.event
 async def stop_wake(sid):
-    global wake_listener, wake_task
-
     print(f"[WAKE] stop_wake received from {sid}")
 
-    if wake_listener:
-        wake_listener.stop()
-
-    if wake_task and not wake_task.done():
-        wake_task.cancel()
-
-        try:
-            await wake_task
-        except asyncio.CancelledError:
-            print("[WAKE] Wake task cancelled successfully")
-        except Exception as error:
-            print(f"[WAKE] Error while cancelling wake task: {error}")
-
-    wake_listener = None
-    wake_task = None
+    await stop_wake_listener()
 
     await sio.emit(
         "voice_status",

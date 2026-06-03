@@ -4,6 +4,7 @@ import { voiceSocket } from "../services/voiceSocket";
 export function useVoiceAssistant() {
   const [isVoiceConnected, setIsVoiceConnected] = useState(false);
   const [isVoiceRunning, setIsVoiceRunning] = useState(false);
+  const [isWakeListening, setIsWakeListening] = useState(false);
   const [voiceStatus, setVoiceStatus] = useState("disconnected");
   const [voiceMessage, setVoiceMessage] = useState("");
   const [lastTranscription, setLastTranscription] = useState(null);
@@ -11,31 +12,88 @@ export function useVoiceAssistant() {
 
   useEffect(() => {
     function handleConnect() {
+      console.log("[VOICE SOCKET] Connected");
+
       setIsVoiceConnected(true);
       setVoiceStatus("connected");
+      setVoiceMessage("Connected to ANKA Voice Backend");
     }
 
     function handleDisconnect() {
+      console.log("[VOICE SOCKET] Disconnected");
+
       setIsVoiceConnected(false);
       setIsVoiceRunning(false);
+      setIsWakeListening(false);
       setVoiceStatus("disconnected");
+      setVoiceMessage("Disconnected from ANKA Voice Backend");
     }
 
     function handleVoiceStatus(data) {
-      setVoiceStatus(data.status);
-      setVoiceMessage(data.message || "");
+      console.log("[VOICE STATUS]", data);
+
+      const status = data?.status || "unknown";
+      const message = data?.message || "";
+
+      setVoiceStatus(status);
+      setVoiceMessage(message);
+
+      if (status === "wake_listening") {
+        setIsWakeListening(true);
+        setIsVoiceRunning(false);
+        return;
+      }
+
+      if (status === "wake_detected") {
+        setIsWakeListening(false);
+        setIsVoiceRunning(true);
+        return;
+      }
 
       if (
-        data.status === "started" ||
-        data.status === "listening" ||
-        data.status === "speaking_ready"
+        status === "starting" ||
+        status === "started" ||
+        status === "listening" ||
+        status === "speaking_ready" ||
+        status === "already_running" ||
+        status === "resumed" ||
+        status === "tool_executed"
       ) {
+        setIsWakeListening(false);
         setIsVoiceRunning(true);
+        return;
       }
 
-      if (data.status === "stopped") {
-        setIsVoiceRunning(false);
+      // wake_stopped only means Vosk stopped.
+      // It does not mean Gemini voice mode stopped.
+      if (status === "wake_stopped") {
+        setIsWakeListening(false);
+        return;
       }
+
+      if (status === "stopped") {
+        setIsVoiceRunning(false);
+        return;
+      }
+
+      if (status === "paused") {
+        setIsVoiceRunning(true);
+        return;
+      }
+
+      if (status === "error" || status === "wake_error") {
+        setIsVoiceRunning(false);
+        setIsWakeListening(false);
+      }
+    }
+
+    function handleWakeDetected(data) {
+      console.log("[WAKE DETECTED]", data);
+
+      setVoiceStatus("wake_detected");
+      setVoiceMessage(data?.message || "Hola Anka detected");
+      setIsWakeListening(false);
+      setIsVoiceRunning(true);
     }
 
     function handleTranscription(data) {
@@ -51,23 +109,46 @@ export function useVoiceAssistant() {
       });
     }
 
+    function handleToolResult(data) {
+      console.log("[TOOL RESULT]", data);
+
+      if (data?.message) {
+        setVoiceMessage(data.message);
+      }
+
+      setVoiceStatus("tool_executed");
+      setIsWakeListening(false);
+      setIsVoiceRunning(true);
+    }
+
     function handleVoiceError(data) {
       console.error("[VOICE ERROR]", data);
+
       setVoiceError(data?.message || "Voice backend error");
       setVoiceMessage(data?.message || "Voice backend error");
+      setIsVoiceRunning(false);
+      setIsWakeListening(false);
     }
 
     voiceSocket.on("connect", handleConnect);
     voiceSocket.on("disconnect", handleDisconnect);
     voiceSocket.on("voice_status", handleVoiceStatus);
+    voiceSocket.on("wake_detected", handleWakeDetected);
     voiceSocket.on("voice_transcription", handleTranscription);
+    voiceSocket.on("tool_result", handleToolResult);
     voiceSocket.on("voice_error", handleVoiceError);
+
+    if (!voiceSocket.connected) {
+      voiceSocket.connect();
+    }
 
     return () => {
       voiceSocket.off("connect", handleConnect);
       voiceSocket.off("disconnect", handleDisconnect);
       voiceSocket.off("voice_status", handleVoiceStatus);
+      voiceSocket.off("wake_detected", handleWakeDetected);
       voiceSocket.off("voice_transcription", handleTranscription);
+      voiceSocket.off("tool_result", handleToolResult);
       voiceSocket.off("voice_error", handleVoiceError);
     };
   }, []);
@@ -87,6 +168,11 @@ export function useVoiceAssistant() {
   function startVoice(currentChatId) {
     connectVoice();
 
+    setIsWakeListening(false);
+    setIsVoiceRunning(true);
+    setVoiceStatus("starting");
+    setVoiceMessage("Starting ANKA voice mode...");
+
     setTimeout(() => {
       voiceSocket.emit("start_voice", {
         chatId: currentChatId,
@@ -96,6 +182,10 @@ export function useVoiceAssistant() {
 
   function stopVoice() {
     voiceSocket.emit("stop_voice");
+
+    setIsVoiceRunning(false);
+    setVoiceStatus("stopped");
+    setVoiceMessage("Voice session stopped. Say 'Hola Anka' to wake me.");
   }
 
   function pauseVoice() {
@@ -109,6 +199,7 @@ export function useVoiceAssistant() {
   return {
     isVoiceConnected,
     isVoiceRunning,
+    isWakeListening,
     voiceStatus,
     voiceMessage,
     lastTranscription,

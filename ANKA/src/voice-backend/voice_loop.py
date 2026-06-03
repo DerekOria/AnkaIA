@@ -6,6 +6,8 @@ import pyaudio
 from dotenv import load_dotenv
 from google import genai
 from google.genai import types
+from google.genai import errors
+from websockets.exceptions import ConnectionClosedOK, ConnectionClosedError
 
 load_dotenv()
 
@@ -25,7 +27,7 @@ You can speak and understand:
 - English
 - French
 - Spanish
-- Arabic 
+- Arabic
 
 Language rules:
 - Always answer in the same language the user is currently speaking.
@@ -129,6 +131,10 @@ class VoiceLoop:
             raise
 
         except Exception as error:
+            if self.stop_event.is_set():
+                print("[VOICE] listen_microphone stopped cleanly")
+                return
+
             traceback.print_exc()
             self.emit_error(f"Microphone error: {error}")
 
@@ -141,7 +147,7 @@ class VoiceLoop:
                         timeout=0.1,
                     )
 
-                    if self.session:
+                    if self.session and not self.stop_event.is_set():
                         await self.session.send(input=msg, end_of_turn=False)
 
                 except asyncio.TimeoutError:
@@ -152,6 +158,10 @@ class VoiceLoop:
             raise
 
         except Exception as error:
+            if self.stop_event.is_set():
+                print("[VOICE] send_audio_to_model stopped cleanly")
+                return
+
             traceback.print_exc()
             self.emit_error(f"Send audio error: {error}")
 
@@ -162,13 +172,13 @@ class VoiceLoop:
                     await asyncio.sleep(0.05)
                     continue
 
-                turn = self.session.receive()
+                try:
+                    turn = self.session.receive()
 
-                async for response in turn:
-                    if self.stop_event.is_set():
-                        break
+                    async for response in turn:
+                        if self.stop_event.is_set():
+                            break
 
-                    try:
                         server_content = getattr(response, "server_content", None)
 
                         if not server_content:
@@ -205,16 +215,28 @@ class VoiceLoop:
                                 if inline_data and inline_data.data:
                                     await self.audio_in_queue.put(inline_data.data)
 
-                    except Exception as inner_error:
-                        print(
-                            f"[VOICE] Error while processing model response: {inner_error}"
-                        )
+                except errors.APIError as error:
+                    # Gemini Live can return APIError 1000 when the websocket
+                    # closes normally after stop/cancel. This is not a crash.
+                    if "1000" in str(error) or self.stop_event.is_set():
+                        print("[VOICE] Gemini websocket closed normally")
+                        break
+
+                    raise
+
+                except (ConnectionClosedOK, ConnectionClosedError):
+                    print("[VOICE] Gemini websocket connection closed")
+                    break
 
         except asyncio.CancelledError:
             print("[VOICE] receive_from_model cancelled")
             raise
 
         except Exception as error:
+            if self.stop_event.is_set():
+                print("[VOICE] receive_from_model stopped cleanly")
+                return
+
             traceback.print_exc()
             self.emit_error(f"Receive audio error: {error}")
 
@@ -237,7 +259,8 @@ class VoiceLoop:
                         timeout=0.1,
                     )
 
-                    await asyncio.to_thread(self.output_stream.write, data)
+                    if not self.stop_event.is_set():
+                        await asyncio.to_thread(self.output_stream.write, data)
 
                 except asyncio.TimeoutError:
                     continue
@@ -247,6 +270,10 @@ class VoiceLoop:
             raise
 
         except Exception as error:
+            if self.stop_event.is_set():
+                print("[VOICE] play_audio stopped cleanly")
+                return
+
             traceback.print_exc()
             self.emit_error(f"Speaker error: {error}")
 
@@ -306,6 +333,10 @@ class VoiceLoop:
             raise
 
         except Exception as error:
+            if self.stop_event.is_set():
+                print("[VOICE] VoiceLoop stopped cleanly")
+                return
+
             traceback.print_exc()
             self.emit_error(f"Voice loop error: {error}")
 
@@ -318,6 +349,7 @@ class VoiceLoop:
             if self.audio_stream:
                 self.audio_stream.stop_stream()
                 self.audio_stream.close()
+                self.audio_stream = None
         except Exception:
             pass
 
@@ -325,5 +357,6 @@ class VoiceLoop:
             if self.output_stream:
                 self.output_stream.stop_stream()
                 self.output_stream.close()
+                self.output_stream = None
         except Exception:
             pass

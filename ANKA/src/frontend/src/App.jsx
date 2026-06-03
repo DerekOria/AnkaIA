@@ -22,6 +22,7 @@ function App() {
 
   const {
     isVoiceRunning,
+    isWakeListening,
     voiceMessage,
     lastTranscription,
     startVoice,
@@ -263,9 +264,19 @@ function App() {
     };
   }, []);
 
+  // Real voice mode: used for the button behavior.
   const voiceButtonActive = isVoiceRunning || isVoiceStarting;
+
+  // Visual active mode: used for the orb/UI animation.
+  // This keeps ANKA visually active while waiting for "Hola Anka".
+  const orbVisualActive = isVoiceRunning || isVoiceStarting;
+
   const displayedDiagnosticMessage =
-    voiceMessage || diagnosticMessage || "System ready for input";
+  voiceMessage ||
+  (isWakeListening
+    ? "Wake mode active. Say 'Hola Anka' to start voice mode."
+    : diagnosticMessage) ||
+  "System ready for input";
 
   return (
     <div className="flex h-screen bg-[#050510] text-[#00f2ff]">
@@ -289,7 +300,7 @@ function App() {
           messages={messages}
           input={input}
           isLoading={isLoading}
-          isListening={voiceButtonActive}
+          isListening={orbVisualActive}
           onInputChange={setInput}
           onSend={() => sendStreamingMessage(input)}
           onKeyPress={handleKeyDown}
