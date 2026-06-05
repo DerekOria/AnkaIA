@@ -88,6 +88,40 @@ function App() {
       setSystemStatus("ERROR");
     }
   }
+   
+  async function deleteChat(chatId){
+    try {
+      const confirmDelete = window.confirm("Are you sure you want to delete this chat? This action cannot be undone.");
+
+      if (!confirmDelete) return;
+
+      const response = await fetch(`/api/chats/${chatId}`, {
+        method: 'DELETE'
+      });
+
+      const data = await response.json();
+
+      if (!data.success) {
+        throw new Error(data.error || "Failed to delete chat");
+      }
+      
+      setChats((prevChats) => prevChats.filter((chat) => chat.id !== chatId));
+
+    if (currentChatIdRef.current === chatId) {
+      setCurrentChatId(null);
+      setMessages([]);
+
+      const remainingChats = chats.filter((chat) => chat.id !== chatId);
+
+      if (remainingChats.length > 0) {
+        await selectChat(remainingChats[0].id);
+      }
+    }
+    } catch (error) {
+      console.error("deleteChat error:", error);
+      setSystemStatus("ERROR");
+    }
+  }
 
   async function createNewChat() {
     try {
@@ -286,6 +320,7 @@ function App() {
           currentChatId={currentChatId}
           loading={isLoading}
           onChatSelect={selectChat}
+          onDeleteChat={deleteChat}
           onNewChat={createNewChat}
         />
       </div>

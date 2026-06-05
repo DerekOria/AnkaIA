@@ -5,6 +5,8 @@ import uvicorn
 from fastapi import FastAPI
 from dotenv import load_dotenv
 
+from connectivity import can_use_gemini
+from local_voice_loop import LocalVoiceLoop
 from wake_listener import WakeListener
 from voice_loop import VoiceLoop
 from command_router import CommandRouter
@@ -72,6 +74,11 @@ async def disconnect(sid):
 
     if connected_sid == sid:
         connected_sid = None
+
+    # If the frontend disconnects while ANKA is only in wake mode,
+    # stop the old wake listener so a new client gets a fresh listener.
+    if not voice_task or voice_task.done():
+        await stop_wake_listener()
 
 
 async def stop_wake_listener():
@@ -189,7 +196,7 @@ async def start_voice_internal(sid, started_by_wake=False):
         voice_loop = None
         voice_task = None
 
-    # Critical: fully stop Vosk so Gemini can take the microphone.
+    
     await stop_wake_listener()
 
     def on_status(payload):
@@ -263,7 +270,37 @@ async def start_voice_internal(sid, started_by_wake=False):
             )
         )
 
-    voice_loop = VoiceLoop(
+    use_gemini = can_use_gemini()
+
+    if use_gemini:
+        selected_loop_class = VoiceLoop
+
+        await sio.emit(
+            "voice_status",
+            {
+                "status": "online_mode",
+                "message": "Online mode active. Using Gemini Live.",
+            },
+            room=sid,
+        )
+
+        print("[VOICE] Selected engine: Gemini Live")
+
+    else:
+        selected_loop_class = LocalVoiceLoop
+
+        await sio.emit(
+            "voice_status",
+            {
+                "status": "offline_mode",
+                "message": "Offline mode active. Using local voice system.",
+            },
+            room=sid,
+        )
+
+        print("[VOICE] Selected engine: Local offline voice")
+
+    voice_loop = selected_loop_class(
         on_status=on_status,
         on_transcription=on_transcription,
         on_error=on_error,

@@ -5,3 +5,9 @@ python-dotenv
 google-genai
 pyaudio
 vosk
+requests
+pyttsx3
+faster-whisper
+sounddevice
+scipy
+numpy

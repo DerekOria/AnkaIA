@@ -1,5 +1,5 @@
 import express from "express";
-
+import fs from "fs/promises";
 import upload from "../middleware/uploadHandler.js";
 import { chatWithLlama, streamChatWithLlama } from "../../services/ai/chatService.js";
 import { logErrorToFile } from "../utils/logger.js";
@@ -241,6 +241,38 @@ router.post("/chat/stream", async (req, res) => {
 
     res.write("\n[Erreur: streaming interrompu]");
     res.end();
+  }
+});
+
+// DELETE /api/chats/:chatId
+router.delete("/chats/:chatId", async (req, res) => {
+  try {
+    const { chatId } = req.params;
+
+    const fileData = await fs.readFile("./src/backend/storage/chats.json", "utf-8");
+    const data = JSON.parse(fileData);
+
+    const updatedChats =  {
+      ...data,
+      chats: data.chats.filter((chat) => chat.id !== chatId) };
+
+    await fs.writeFile(
+      "./src/backend/storage/chats.json",
+      JSON.stringify(updatedChats, null, 2),
+      "utf-8"
+    );
+
+    res.json({
+      success: true,
+      message: "Chat deleted successfully",
+    });
+  } catch (error) {
+    console.error("delete chat error:", error);
+
+    res.status(500).json({
+      success: false,
+      error: "Failed to delete chat",
+    });
   }
 });
 

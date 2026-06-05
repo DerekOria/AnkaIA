@@ -9,6 +9,7 @@ export function useVoiceAssistant() {
   const [voiceMessage, setVoiceMessage] = useState("");
   const [lastTranscription, setLastTranscription] = useState(null);
   const [voiceError, setVoiceError] = useState(null);
+  const [voiceMode, setVoiceMode] = useState("unknown");
 
   useEffect(() => {
     function handleConnect() {
@@ -27,6 +28,7 @@ export function useVoiceAssistant() {
       setIsWakeListening(false);
       setVoiceStatus("disconnected");
       setVoiceMessage("Disconnected from ANKA Voice Backend");
+      setVoiceMode("unknown");
     }
 
     function handleVoiceStatus(data) {
@@ -37,6 +39,20 @@ export function useVoiceAssistant() {
 
       setVoiceStatus(status);
       setVoiceMessage(message);
+
+      if (status === "online_mode") {
+        setVoiceMode("online");
+        setIsWakeListening(false);
+        setIsVoiceRunning(true);
+        return;
+      }
+
+      if (status === "offline_mode") {
+        setVoiceMode("offline");
+        setIsWakeListening(false);
+        setIsVoiceRunning(true);
+        return;
+      }
 
       if (status === "wake_listening") {
         setIsWakeListening(true);
@@ -57,15 +73,17 @@ export function useVoiceAssistant() {
         status === "speaking_ready" ||
         status === "already_running" ||
         status === "resumed" ||
-        status === "tool_executed"
+        status === "tool_executed" ||
+        status === "thinking" ||
+        status === "speaking"
       ) {
         setIsWakeListening(false);
         setIsVoiceRunning(true);
         return;
       }
 
-      // wake_stopped only means Vosk stopped.
-      // It does not mean Gemini voice mode stopped.
+      // wake_stopped only means Vosk wake mode stopped.
+      // It does not necessarily mean Gemini/local voice mode stopped.
       if (status === "wake_stopped") {
         setIsWakeListening(false);
         return;
@@ -202,6 +220,7 @@ export function useVoiceAssistant() {
     isWakeListening,
     voiceStatus,
     voiceMessage,
+    voiceMode,
     lastTranscription,
     voiceError,
     connectVoice,

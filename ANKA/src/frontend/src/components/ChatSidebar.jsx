@@ -5,6 +5,7 @@ export function ChatSidebar({
   chats = [],
   currentChatId,
   onChatSelect,
+  onDeleteChat,
   onNewChat,
   loading,
 }) {
@@ -20,7 +21,7 @@ export function ChatSidebar({
           ANKA
         </h2>
         <p className="font-['Fira_Code'] text-xs text-[#8b5cf6]/60 mt-1">
-          v1.0
+          v3.0
         </p>
       </div>
 
@@ -54,23 +55,42 @@ export function ChatSidebar({
           </div>
         ) : (
           chats.map((chat) => (
-            <motion.button
+            <motion.div
               key={chat.id}
               whileHover={{ x: 4 }}
               onClick={() => onChatSelect(chat.id)}
-              className={`w-full text-left px-3 py-2 rounded-lg transition-all ${
+              className={`w-full text-left px-2 py-2 rounded-lg transition-all ${
                 currentChatId === chat.id
                   ? "bg-[#00f2ff]/20 border border-[#00f2ff]/50 text-[#00f2ff]"
                   : "bg-white/5 border border-white/10 text-[#00f2ff]/70 hover:bg-white/10"
               }`}
             >
+              <button
+                  onClick={(e) => {
+                  e.stopPropagation();
+                  onDeleteChat(chat.id);
+                }}
+                className="text-red-400 hover:text-red-300 hover:bg-red-500/10 px-2 py-1 rounded-md transition-all"
+                title="Delete chat"
+                disabled={loading}>
+                  X
+                </button>
+
               <p className="font-['JetBrains_Mono'] text-xs font-bold truncate">
                 {chat.name}
               </p>
               <p className="font-['Fira_Code'] text-xs text-[#8b5cf6]/50 mt-1">
                 {chat.messageCount} messages
               </p>
-            </motion.button>
+
+              <button 
+                onclick={() => onChatSelect(chat.id)
+
+                }
+              />
+
+              
+            </motion.div>
           ))
         )}
       </div>
