@@ -84,7 +84,7 @@ export function ChatSidebar({
               </p>
 
               <button 
-                onclick={() => onChatSelect(chat.id)
+                onClick={() => onChatSelect(chat.id)
 
                 }
               />

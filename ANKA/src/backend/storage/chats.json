@@ -4,7 +4,37 @@
       "id": "chat-1780686071324",
       "name": "New Chat 3:01:11 PM",
       "createdAt": "2026-06-05T19:01:11.325Z",
-      "messages": []
+      "messages": [
+        {
+          "id": "msg-1780881772155",
+          "role": "user",
+          "content": "Hola",
+          "timestamp": "2026-06-08T01:22:52.155Z"
+        },
+        {
+          "id": "msg-1780881772156",
+          "role": "ai",
+          "content": "Erreur: impossible de streamer la réponse d'ANKA.",
+          "timestamp": "2026-06-08T01:22:52.155Z",
+          "streaming": false,
+          "error": true,
+          "completedAt": "2026-06-08T01:22:52.272Z"
+        },
+        {
+          "id": "msg-1780884249724",
+          "role": "user",
+          "content": "hola",
+          "timestamp": "2026-06-08T02:04:09.724Z"
+        },
+        {
+          "id": "msg-1780884249725",
+          "role": "ai",
+          "content": "Hola! Je suis ANKA, votre assistant IA local pour support technique et conversation. Comment puis-je vous aider aujourd'hui ?",
+          "timestamp": "2026-06-08T02:04:09.724Z",
+          "streaming": false,
+          "completedAt": "2026-06-08T02:04:19.690Z"
+        }
+      ]
     }
   ]
 }
